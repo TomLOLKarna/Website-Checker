@@ -21,10 +21,9 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: website-monitor/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        working-directory: website-monitor
         run: npm ci
 
       - name: Cache Playwright browsers
@@ -32,28 +31,25 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('website-monitor/package-lock.json') }}
+          key: playwright-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        working-directory: website-monitor
         run: npx playwright install chromium --with-deps
 
       - name: Install Playwright system deps (if cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        working-directory: website-monitor
         run: npx playwright install-deps chromium
 
       - name: Restore state cache
         uses: actions/cache@v4
         with:
-          path: website-monitor/state
+          path: state
           key: monitor-state-${{ github.run_id }}
           restore-keys: |
             monitor-state-
 
       - name: Run Monitor
-        working-directory: website-monitor
         env:
           SITE_URL: https://ostermann-digital.de
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -66,5 +62,5 @@ jobs:
         if: always()
         uses: actions/cache@v4
         with:
-          path: website-monitor/state
+          path: state
           key: monitor-state-${{ github.run_id }}

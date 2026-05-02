@@ -1,0 +1,70 @@
+name: Website Monitor
+
+on:
+  schedule:
+    # Alle 30 Minuten
+    - cron: "*/30 * * * *"
+  workflow_dispatch: # Manuell triggern möglich
+
+jobs:
+  monitor:
+    name: Run Monitor Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: website-monitor/package-lock.json
+
+      - name: Install dependencies
+        working-directory: website-monitor
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('website-monitor/package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        working-directory: website-monitor
+        run: npx playwright install chromium --with-deps
+
+      - name: Install Playwright system deps (if cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        working-directory: website-monitor
+        run: npx playwright install-deps chromium
+
+      - name: Restore state cache
+        uses: actions/cache@v4
+        with:
+          path: website-monitor/state
+          key: monitor-state-${{ github.run_id }}
+          restore-keys: |
+            monitor-state-
+
+      - name: Run Monitor
+        working-directory: website-monitor
+        env:
+          SITE_URL: https://ostermann-digital.de
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # Phase 2: diese Secrets hinzufügen wenn bereit
+          # ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # AGENTS_ENABLED: "true"
+        run: npx tsx monitor/check.ts
+
+      - name: Save state cache
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: website-monitor/state
+          key: monitor-state-${{ github.run_id }}

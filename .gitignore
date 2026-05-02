@@ -1,0 +1,7 @@
+node_modules/
+state/*.json
+state/*.log
+state/*.jsonl
+.env
+.env.local
+dist/

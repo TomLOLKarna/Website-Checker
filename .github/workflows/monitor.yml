@@ -4,7 +4,12 @@ on:
   schedule:
     # Alle 30 Minuten
     - cron: "*/30 * * * *"
-  workflow_dispatch: # Manuell triggern möglich
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: "Optional: abweichende URL für Testlauf"
+        required: false
+        default: "https://ostermann-digital.de"
 
 jobs:
   monitor:
@@ -46,7 +51,7 @@ jobs:
 
       - name: Run Monitor
         env:
-          SITE_URL: https://ostermann-digital.de
+          SITE_URL: ${{ inputs.site_url || 'https://ostermann-digital.de' }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           # Phase 2: diese Secrets hinzufügen wenn bereit
           # ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

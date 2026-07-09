@@ -54,8 +54,8 @@ async function run() {
     // Alles ok — Known-Good aktualisieren
     writeLastKnownGood(result);
 
-    // War vorher ein Problem und ist jetzt wieder ok? Recovery-Notification.
-    if (baseline && baseline.status !== "ok" && result.status === "ok") {
+    // War der letzte Check nicht ok und jetzt wieder ok? Recovery-Notification.
+    if (previousCheck && previousCheck.status !== "ok" && result.status === "ok") {
       await sendRecovery(result);
       resetCircuitBreaker();
     }

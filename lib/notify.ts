@@ -47,6 +47,7 @@ export async function sendAlert(result: CheckResult, reasons: string[]) {
     footer: { text: "ostermann-digital Monitor" },
     timestamp: result.ts,
   });
+  log("info", "Discord Alert gesendet", { status: result.status, reasons });
 }
 
 export async function sendRecovery(result: CheckResult) {
@@ -57,6 +58,7 @@ export async function sendRecovery(result: CheckResult) {
     footer: { text: "ostermann-digital Monitor" },
     timestamp: result.ts,
   });
+  log("info", "Discord Recovery gesendet");
 }
 
 export async function sendCircuitBreakerAlert(signature: string) {

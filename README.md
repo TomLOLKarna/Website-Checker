@@ -64,6 +64,8 @@ Inhalt: `{"paused": false, "count": 0, "lastSignature": ""}`
 
 Wenn du Self-Healing aktivieren willst (Anthropic API nötig):
 
+Der verbindliche Sicherheits- und PR-Ablauf steht in [PHASE2_PR_WORKFLOW.md](./PHASE2_PR_WORKFLOW.md). Phase 2 bleibt bis zu einem manuellen Preview-Test deaktiviert.
+
 1. Account erstellen auf [console.anthropic.com](https://console.anthropic.com)
 2. API-Key generieren, als GitHub-Secret `ANTHROPIC_API_KEY` hinterlegen
 3. In `.github/workflows/monitor.yml` diese Zeilen auskommentieren:

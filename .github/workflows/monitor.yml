@@ -2,8 +2,8 @@ name: Website Monitor
 
 on:
   schedule:
-    # Alle 30 Minuten
-    - cron: "*/30 * * * *"
+    # Vier Checks pro Tag reichen für die Portfolio-Website und schonen das Actions-Kontingent.
+    - cron: "0 */6 * * *"
   workflow_dispatch:
     inputs:
       site_url:
@@ -11,11 +11,18 @@ on:
         required: false
         default: "https://ostermann-digital.de"
 
+permissions:
+  contents: read
+
+concurrency:
+  group: website-monitor
+  cancel-in-progress: true
+
 jobs:
   monitor:
     name: Run Monitor Check
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
